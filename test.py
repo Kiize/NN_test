@@ -24,4 +24,4 @@ layer2 = Layer_Dense(5, 2)
 layer1.forward(X)
 print(layer1.output)
 
-print("elapsed time: %.1f seconds" % (time.time() - start))
+print(f"elapsed time: {(time.time() - start):.1f} seconds")
