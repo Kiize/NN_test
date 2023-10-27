@@ -23,6 +23,13 @@ class Activation_ReLU:
     def forward(self, inputs):
         self.output = np.maximum(0, inputs)
 
+class Activation_Softmax:
+    def forward(self, inputs):
+        exp_values = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
+        probabilities = exp_values / np.sum(exp_values, axis=1, keepdims=True)
+        self.output = probabilities        
+        
+
 def create_data(points, classes):
     x = np.zeros((points*classes, 2))
     y = np.zeros(points*classes, dtype='uint8')
@@ -39,12 +46,13 @@ def create_data(points, classes):
 x, y = create_data(100, 3)
 
 layer1 = Layer_Dense(4, 3)
-activation1 = Activation_ReLU()
+activation1 = Activation_Softmax()
 
 layer1.forward(X)
-exp_values = np.exp(layer1.output)
-norm_values = exp_values / np.sum(exp_values, axis=1, keepdims=True)
-print(norm_values)
+activation1.forward(layer1.output)
+
+print(activation1.output)
+
 
 
 print(f"elapsed time: {(time.time() - start):.1f} seconds\n")
