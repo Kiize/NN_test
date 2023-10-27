@@ -38,13 +38,13 @@ def create_data(points, classes):
 
 x, y = create_data(100, 3)
 
-layer1 = Layer_Dense(2, 5)
+layer1 = Layer_Dense(4, 3)
 activation1 = Activation_ReLU()
 
-layer1.forward(x)
-activation1.forward(layer1.output)
+layer1.forward(X)
+exp_values = np.exp(layer1.output)
+norm_values = exp_values / np.sum(exp_values, axis=1, keepdims=True)
+print(norm_values)
 
-#print(layer1.output)
-print(activation1.output)
 
 print(f"elapsed time: {(time.time() - start):.1f} seconds\n")
