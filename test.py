@@ -5,12 +5,6 @@ import time
 start = time.time()
 np.random.seed(0)
 
-X = [
-    [1, 2, 3, 2.5],
-    [2, 5, -1, 2],
-    [-1.5, 2.7, 3.3, -0.8]
-]
-
 class Layer_Dense:
     def __init__(self, n_inputs, n_neurons):
         self.weights = 0.10 * np.random.randn(n_inputs, n_neurons)
@@ -43,16 +37,44 @@ def create_data(points, classes):
 
     return x, y
 
+class Loss:
+    def calculate(self, output, y):
+        sample_losses = self.forward(output, y)
+        data_loss = np.mean(sample_losses)
+        return data_loss
+    
+class Loss_CategoricalCrossEntropy(Loss):
+    def forward(self, y_pred, y_true):
+        samples = len(y_pred)
+        y_pred_clipped = np.clip(y_pred, 1e-7, 1-1e-7)
+
+        if len(y_true.shape) == 1:
+            correct_confidences = y_pred_clipped[range(samples), y_true]
+        elif len(y_true.shape) == 2:
+            correct_confidences = np.sum(y_pred_clipped * y_true, axis=1)
+
+        negative_log_likelihoods = -np.log(correct_confidences)
+        return negative_log_likelihoods
+
+X = np.array([
+    [1, 2, 3, 2.5],
+    [2, 5, -1, 2],
+    [-1.5, 2.7, 3.3, -0.8]
+])
+
 x, y = create_data(100, 3)
 
-layer1 = Layer_Dense(4, 3)
+layer1 = Layer_Dense(2, 3)
 activation1 = Activation_Softmax()
+loss_function = Loss_CategoricalCrossEntropy()
 
-layer1.forward(X)
+layer1.forward(x)
 activation1.forward(layer1.output)
 
-print(activation1.output)
+loss = loss_function.calculate(activation1.output, y)
 
-
+plt.scatter(x[:, 0], x[:, 1], c = y, cmap='brg')
 
 print(f"elapsed time: {(time.time() - start):.1f} seconds\n")
+
+plt.show()
