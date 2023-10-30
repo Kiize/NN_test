@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
+from torch.optim import SGD
 import time
+import matplotlib.pyplot as plt
 
 start = time.time()
 
@@ -37,11 +39,24 @@ class MyNeuralNet(nn.Module):
         return x.squeeze()
 
 f = MyNeuralNet()
-
-yhat = f(x)
 L = nn.MSELoss()
-print(L(y, yhat))
+
+opt = SGD(f.parameters(), lr = 0.001)
+losses = []
+
+for _ in range(50):
+    opt.zero_grad() #flush previous epoch's gradient
+    loss_value = L(f(x), y) #compute Loss
+    loss_value.backward() #compute gradient
+    opt.step() #perform iteration using gradient
+    losses.append(loss_value.item())
+
+plt.plot(losses)
+plt.xlabel('Loss')
+plt.ylabel('Epochs')
 
 # Time.
 
 print(f"elapsed time: {(time.time() - start):.1f} seconds\n")
+
+plt.show()
