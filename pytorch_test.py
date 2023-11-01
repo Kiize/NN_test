@@ -38,22 +38,44 @@ class MyNeuralNet(nn.Module):
         x = self.Matrix2(x)
         return x.squeeze()
 
-f = MyNeuralNet()
-L = nn.MSELoss()
+class MyNeuralNet2(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.Matrix1 = nn.Linear(2, 80)
+        self.Matrix2 = nn.Linear(80, 80)
+        self.Matrix3 = nn.Linear(80, 1)
+        self.R = nn.ReLU()
 
-opt = SGD(f.parameters(), lr = 0.001)
-losses = []
+    def forward(self, x):
+        """
+        x: vector of inputs
+        """
+        x = self.R(self.Matrix1(x))
+        x = self.R(self.Matrix2(x))
+        x = self.Matrix3(x)
+        return x.squeeze()
 
-for _ in range(50):
-    opt.zero_grad() #flush previous epoch's gradient
-    loss_value = L(f(x), y) #compute Loss
-    loss_value.backward() #compute gradient
-    opt.step() #perform iteration using gradient
-    losses.append(loss_value.item())
+def train_model(x, y, f, n_epochs=50):
+    opt = SGD(f.parameters(), lr = 0.001)
+    L = nn.MSELoss()
+    losses = []
+
+    for _ in range(n_epochs):
+        opt.zero_grad() #flush previous epoch's gradient
+        loss_value = L(f(x), y) #compute Loss
+        loss_value.backward() #compute gradient
+        opt.step() #perform iteration using gradient
+        losses.append(loss_value.item())
+    return f, losses
+
+f2 = MyNeuralNet2()
+f2, losses = train_model(x, y, f2)
 
 plt.plot(losses)
-plt.xlabel('Loss')
-plt.ylabel('Epochs')
+plt.ylabel('Loss')
+plt.xlabel('Epochs')
+
+print(f2(x))
 
 # Time.
 
